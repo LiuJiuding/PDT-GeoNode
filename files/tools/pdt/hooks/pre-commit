@@ -1,0 +1,36 @@
+#!/bin/sh
+# Reject a commit that stages spec/** together with anything else.
+#
+# tools/pdt/docs/10-文档分层与协作规范.md (line 107) states the rule: the user owns spec/**,
+# so an L0 change is always its own commit - an agent must not be able to slip a spec edit into
+# a code commit. That document lists this hook as installed (since 2026-10-06); this file is the
+# source of truth and .git/hooks/pre-commit is a copy of it (git-lfs owns the post-* hooks, so
+# core.hooksPath must stay unset - do not switch to it).
+#
+# Install (once per clone):
+#   cp tools/pdt/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+#
+# Run it through git (`git hook run pre-commit`), never by hand: git puts its own usr/bin on
+# PATH for hooks, a bare `sh.exe` does not have `grep` and both counters then come out empty,
+# which makes this script pass silently. Verified outside the sandbox 2026-10-15.
+#
+# Note for the agent's sandbox: if cygwin `sh.exe` cannot start there (fatal error, "couldn't
+# create signal pipe, Win32 error 5") this hook never runs and `git commit` fails with HEAD
+# unchanged. Fall back to `--no-verify` and keep the rule by hand - see docs/02-版本管理.md §2.2.
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+if [ -z "$staged" ]; then
+  exit 0
+fi
+
+spec_count=$(printf '%s\n' "$staged" | grep -c '^tools/pdt/spec/' || true)
+other_count=$(printf '%s\n' "$staged" | grep -vc '^tools/pdt/spec/' || true)
+
+if [ "$spec_count" -gt 0 ] && [ "$other_count" -gt 0 ]; then
+  echo "pre-commit: spec/** must be committed on its own (docs/10 line 107)." >&2
+  echo "            staged: $spec_count spec file(s), $other_count other file(s)." >&2
+  echo "            Commit tools/pdt/spec/** first, then everything else." >&2
+  exit 1
+fi
+
+exit 0

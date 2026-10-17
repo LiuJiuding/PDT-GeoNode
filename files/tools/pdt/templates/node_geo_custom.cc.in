@@ -1,0 +1,52 @@
+/* SPDX-FileCopyrightText: 2026 PDT Blender Authors
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later */
+
+/** \file
+ * \ingroup geo_nodes
+ *
+ * {{LABEL}}: {{DESCRIPTION}}
+ *
+ * Created by tools/pdt_nodes.py. Keep the namespace name unique per file: the
+ * geometry node library is compiled in unity builds, where colliding internal
+ * names across translation units break the build.
+ */
+
+#include "BKE_geometry_set.hh"
+
+#include "node_geometry_util.hh"
+
+namespace blender::nodes::{{NAMESPACE}} {
+
+static void node_declare(NodeDeclarationBuilder &b)
+{
+  /* Every socket declared here shows up in the Python API as
+   * `node.inputs["Name"].default_value` / `node.outputs["Name"]`. */
+  b.add_input<decl::Geometry>("Geometry"_ustr).description("Input geometry");
+  b.add_output<decl::Geometry>("Geometry"_ustr);
+}
+
+static void node_geo_exec(GeoNodeExecParams params)
+{
+  GeometrySet geometry_set = params.extract_input<GeometrySet>("Geometry"_ustr);
+
+  /* TODO: implement {{LABEL}}. */
+  params.set_output("Geometry"_ustr, geometry_set);
+}
+
+static void node_register()
+{
+  static bke::bNodeType ntype;
+
+  geo_node_type_base(&ntype, "{{ID}}"_ustr);
+  ntype.ui_name = "{{LABEL}}";
+  ntype.ui_description = "{{DESCRIPTION}}";
+  ntype.nclass = NODE_CLASS_GEOMETRY;
+  ntype.declare = node_declare;
+  ntype.geometry_node_execute = node_geo_exec;
+
+  bke::node_register_type(ntype);
+}
+NOD_REGISTER_NODE(node_register)
+
+}  // namespace blender::nodes::{{NAMESPACE}}

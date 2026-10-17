@@ -1,0 +1,28 @@
+{
+  "comment": "Manifest of PDT custom geometry nodes. Managed by tools/pdt_nodes.py. Do not reorder by hand.",
+  "nodes": [
+    {
+      "id": "GeometryNodePDTSelection",
+      "label": "PDT Selection",
+      "category": "PDT",
+      "source": "nodes/custom/node_geo_pdt_selection.cc",
+      "namespace": "node_geo_pdt_selection_cc",
+      "menu": true,
+      "eval_node": true,
+      "expected_geometry_output": "Geometry",
+      "assert_script": "test_pdt_selection.py"
+    },
+    {
+      "id": "GeometryNodePDTWrangle",
+      "label": "PDT Wrangle",
+      "category": "PDT",
+      "source": "nodes/custom/node_geo_pdt_wrangle.cc",
+      "namespace": "node_geo_pdt_wrangle_cc",
+      "rna_def": "rna_def_geo_pdt_wrangle",
+      "menu": true,
+      "eval_node": true,
+      "expected_geometry_output": "Geometry",
+      "assert_script": "test_pdt_wrangle.py"
+    }
+  ]
+}
